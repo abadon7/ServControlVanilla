@@ -1,0 +1,69 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment files
+.env
+.env.*
+
+# Build / generated
+/.turbo
+/.parcel-cache
+.cache
+.next
+out
+coverage
+.nyc_output
+/.pnp
+
+# Vite specific
+/node_modules/
+/dist/
+/public/generated.css
+
+# Tailwind / PostCSS outputs
+src/generated.css
+
+# Firebase emulators and config
+firebase-debug.log
+.firebase/
+
+# OS
+Thumbs.db
+ehthumbs.db
+Icon
+
+# JetBrains
+*.iml
+.idea/
+
+# Mac
+.DS_Store
+
+# Lockfiles (if you intentionally want to ignore any lockfile, remove)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lock
+bun.lockb
