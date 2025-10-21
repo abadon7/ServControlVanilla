@@ -22,19 +22,22 @@ export function mountApp(target = "#app") {
   if (!root) return;
 
   root.innerHTML = `
-    <div class="w-full max-w-4xl mx-auto p-6 bg-white rounded shadow space-y-4">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold">ServControl</h1>
-        <div>
-          <!---<button id="refresh-btn" class="px-3 py-1 mr-2 bg-gray-100 rounded">Refresh</button>--->
-          <button id="sign-out-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 cursor-pointer">Sign out</button>
+    <header class="w-full bg-white sticky top-0 z-40">
+      <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
+        <div class="flex items-center gap-3">
+          <h1 class="text-2xl font-bold">ServControl</h1>
+        </div>
+        <div class="flex items-center gap-2">          
+          <button id="sign-out-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition cursor-pointer">Sign out</button>
         </div>
       </div>
+    </header>
 
-       <div id="db-ui" class="space-y-4">
-        <ul id="items" class="space-y-2"></ul>
-      </div> 
-    </div>
+    <main class="w-full  mx-auto p-4 items-center justify-center flex">
+      <div id="db-ui" class="space-y-4 w-full max-w-2xl">
+        <ul id="items" class="space-y-2 border-gray-100 border-2"></ul>
+      </div>
+    </main>
   `;
 
   // create edit dialog (hidden initially)
@@ -78,7 +81,7 @@ export function mountApp(target = "#app") {
     if (!selectorRow) {
       selectorRow = document.createElement("div");
       selectorRow.id = "selector-row";
-      selectorRow.className = "flex gap-4 items-center justify-start mb-4"; // justify-start for left alignment
+      selectorRow.className = "flex gap-4 items-center justify-start mb-4 p-2 "; // justify-start for left alignment
       itemsEl.parentNode.insertBefore(selectorRow, itemsEl);
     }
 
@@ -231,7 +234,7 @@ export function mountApp(target = "#app") {
 
       const li = document.createElement("li");
       li.className = `p-3 flex justify-between items-center transition ${
-        idx % 2 === 0 ? "bg-white" : "bg-[#e0f7fa]"
+        idx % 2 === 0 ? "bg-white" : "bg-white"
       } hover:bg-[#caf0f8] rounded`;
 
       const day = value?.date?.split("-")[2] || "0";
@@ -239,16 +242,20 @@ export function mountApp(target = "#app") {
       const est = value?.est || "0";
 
       li.innerHTML = `
-    <span class="flex-1 text-center text-[#023e8a] font-medium">${escapeHtml(
-      day
-    )}</span>
-    <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(horas)}</span>
-    <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(est)}</span>
-    <div class="w-40 flex items-center justify-center gap-2">
-  <button data-key="${key}" class="edit-btn px-3 py-1 text-sm bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition cursor-pointer" aria-label="Edit record">Edit</button>
-  <button data-key="${key}" class="remove-btn px-3 py-1 text-sm bg-[#00b4d8] text-white rounded-md hover:bg-[#0077b6] transition cursor-pointer" aria-label="Delete record">Delete</button>
-    </div>
-  `;
+        <span class="flex-1 text-center text-[#023e8a] font-medium">${escapeHtml(
+          day
+        )}</span>
+        <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(horas)}</span>
+        <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(est)}</span>
+        <div class="w-40 flex items-center justify-center gap-2">
+          <button data-key="${key}" class="edit-btn px-3 py-1 text-sm bg-green-100 rounded-md hover:bg-green-200 transition cursor-pointer" aria-label="Edit record" title="Edit">
+        <span class="material-symbols-outlined" style="color:#006400;font-size:18px;line-height:1">edit</span>
+          </button>
+          <button data-key="${key}" class="remove-btn px-3 py-1 text-sm bg-[#00b4d8] rounded-md hover:bg-[#0077b6] transition cursor-pointer" aria-label="Delete record" title="Delete">
+        <span class="material-symbols-outlined" style="color:#ffffff;font-size:18px;line-height:1">delete</span>
+          </button>
+        </div>
+      `;
 
       itemsEl.appendChild(li);
     });
