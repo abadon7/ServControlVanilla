@@ -30,7 +30,7 @@ export function mountApp(target = "#app") {
     <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200 dark:border-gray-700 px-4 py-3 bg-white">
       <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-bold">ServControl</h1>
+          <h1 class="text-2xl font-bold">ServControl</h1><span class="text-gray-500">${userName}</span>
         </div>
         <div class="flex items-center gap-2">          
           <button id="sign-out-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition cursor-pointer">Sign out</button>
