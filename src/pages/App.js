@@ -5,24 +5,29 @@ import {
   writeData,
   getData,
   updateData,
+  auth
 } from "../firebase.js";
-import { getAuth } from "firebase/auth";
+//import { getAuth } from "firebase/auth";
   // cache current items for quick access when editing
   const itemsCache = {};
+  let currentPath = "Henry";
   //let currentPath = "/control/Henry/2023/0";
-  const auth = getAuth();
-  const user = auth.currentUser;
-  const firstName = user?.displayName?.split(" ")[0]?.trim();
+  //const auth = getAuth();
+  
+export function mountApp(target = "#app") {
+  //const getAuth = () => auth;
+  const userP = auth.currentUser;
+  console.log("Current user:", userP);
+  const firstName = userP?.displayName?.split(" ")[0]?.trim();
   const userName =
     firstName && firstName.toLowerCase() === "carito"
       ? "Carolina"
-      : firstName || user?.email?.split("@")[0] || "Henry";
+      : firstName || userP?.email?.split("@")[0] || "Henry";
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  let currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
+  currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
   console.log("Initial currentPath:", currentPath);
-export function mountApp(target = "#app") {
   const root = document.querySelector(target);
   if (!root) return;
 
@@ -30,7 +35,7 @@ export function mountApp(target = "#app") {
     <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200 dark:border-gray-700 px-4 py-3 bg-white">
       <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-bold">ServControl</h1><span class="text-gray-500">${userName}</span>
+          <h1 class="text-2xl font-bold">ServControl</h1><span class="text-gray-500">${userP.displayName}</span>
         </div>
         <div class="flex items-center gap-2">          
           <button id="sign-out-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition cursor-pointer">Sign out</button>
@@ -183,8 +188,9 @@ export function mountApp(target = "#app") {
     summary.className =
       "mb-2 p-3 rounded bg-[#caf0f8] flex gap-6 justify-center items-center font-semibold text-[#023e8a]";
     // Get the current user's info from Firebase Auth
-    const auth = getAuth();
+    //const auth = getAuth();
     const user = auth.currentUser || {};
+    console.log("Rendering summary for user from renderlist:", user);
     const photoURL =
       user.photoURL ||
       "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg";
@@ -406,7 +412,7 @@ function createEditDialog() {
   const editHorasMinutes = modal.querySelector("#edit-horas-minutes");
 
   let currentEditKey = null;
-  const auth = getAuth();
+  //const auth = getAuth();
   const user = auth.currentUser;
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Henry';
   const now = new Date();
