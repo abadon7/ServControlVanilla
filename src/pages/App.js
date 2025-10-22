@@ -12,17 +12,22 @@ import { getAuth } from "firebase/auth";
   //let currentPath = "/control/Henry/2023/0";
   const auth = getAuth();
   const user = auth.currentUser;
-  const userName = user?.displayName.split(" ")[0] || user?.email?.split('@')[0] || 'Henry';
+  const firstName = user?.displayName?.split(" ")[0]?.trim();
+  const userName =
+    firstName && firstName.toLowerCase() === "carito"
+      ? "Carolina"
+      : firstName || user?.email?.split("@")[0] || "Henry";
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
   let currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
+  console.log("Initial currentPath:", currentPath);
 export function mountApp(target = "#app") {
   const root = document.querySelector(target);
   if (!root) return;
 
   root.innerHTML = `
-    <header class="w-full bg-white sticky top-0 z-40">
+    <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200 dark:border-gray-700 px-4 py-3 bg-white">
       <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
         <div class="flex items-center gap-3">
           <h1 class="text-2xl font-bold">ServControl</h1>
@@ -32,6 +37,7 @@ export function mountApp(target = "#app") {
         </div>
       </div>
     </header>
+    <div class="flex items-center gap-2 text-gray-900 dark:text-white"></div>
 
     <main class="w-full  mx-auto p-4 items-center justify-center flex">
       <div id="db-ui" class="space-y-4 w-full max-w-2xl">
@@ -248,11 +254,22 @@ export function mountApp(target = "#app") {
         <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(horas)}</span>
         <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(est)}</span>
         <div class="w-40 flex items-center justify-center gap-2">
-          <button data-key="${key}" class="edit-btn px-3 py-1 text-sm bg-green-100 rounded-md hover:bg-green-200 transition cursor-pointer" aria-label="Edit record" title="Edit">
-        <span class="material-symbols-outlined" style="color:#006400;font-size:18px;line-height:1">edit</span>
+          <button data-key="${key}" class="edit-btn p-2 rounded-md hover:bg-green-100 transition cursor-pointer" aria-label="Edit record" title="Edit">
+        <!-- pencil icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#006400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
           </button>
-          <button data-key="${key}" class="remove-btn px-3 py-1 text-sm bg-[#00b4d8] rounded-md hover:bg-[#0077b6] transition cursor-pointer" aria-label="Delete record" title="Delete">
-        <span class="material-symbols-outlined" style="color:#ffffff;font-size:18px;line-height:1">delete</span>
+          <button data-key="${key}" class="remove-btn p-2 rounded-md hover:bg-[#e0fbff] transition cursor-pointer" aria-label="Delete record" title="Delete">
+        <!-- trash icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#0077b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+          <path d="M10 11v6"></path>
+          <path d="M14 11v6"></path>
+          <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
+        </svg>
           </button>
         </div>
       `;
