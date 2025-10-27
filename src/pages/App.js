@@ -5,15 +5,15 @@ import {
   writeData,
   getData,
   updateData,
-  auth
+  auth,
 } from "../firebase.js";
 //import { getAuth } from "firebase/auth";
-  // cache current items for quick access when editing
-  const itemsCache = {};
-  let currentPath = "Henry";
-  //let currentPath = "/control/Henry/2023/0";
-  //const auth = getAuth();
-  
+// cache current items for quick access when editing
+const itemsCache = {};
+let currentPath = "Henry";
+//let currentPath = "/control/Henry/2023/0";
+//const auth = getAuth();
+
 export function mountApp(target = "#app") {
   //const getAuth = () => auth;
   const userP = auth.currentUser;
@@ -26,16 +26,16 @@ export function mountApp(target = "#app") {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
+  currentPath = `/control/Carolina/${currentYear}/${currentMonth}`;
   console.log("Initial currentPath:", currentPath);
   const root = document.querySelector(target);
   if (!root) return;
 
   root.innerHTML = `
     <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200 dark:border-gray-700 px-4 py-3 bg-white">
-      <div class="max-w-4xl mx-auto flex items-center justify-between p-4">
+      <div class="max-w-4xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <h1 class="text-2xl font-bold">ServControl</h1><span class="text-gray-500">${userP.displayName}</span>
+          <h1 class="text-2xl font-bold">ServControl</h1>
         </div>
         <div class="flex items-center gap-2">          
           <button id="sign-out-btn" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 transition cursor-pointer">Sign out</button>
@@ -46,6 +46,8 @@ export function mountApp(target = "#app") {
 
     <main class="w-full  mx-auto p-4 items-center justify-center flex">
       <div id="db-ui" class="space-y-4 w-full max-w-2xl">
+      <div id="selectors"></div>
+      <div id="totals"></div>
         <ul id="items" class="space-y-2 border-gray-100 border-2"></ul>
       </div>
     </main>
@@ -68,11 +70,10 @@ export function mountApp(target = "#app") {
   }
 
   // simple realtime list under path "/control/Henry/2023/0"
+  const selectorsEl = document.getElementById("selectors");
+  const totalsEl = document.getElementById("totals");
   const itemsEl = document.getElementById("items");
   const refreshBtn = document.getElementById("refresh-btn");
- 
-
-
 
   function renderList(data) {
     itemsEl.innerHTML = "";
@@ -92,8 +93,9 @@ export function mountApp(target = "#app") {
     if (!selectorRow) {
       selectorRow = document.createElement("div");
       selectorRow.id = "selector-row";
-      selectorRow.className = "flex gap-4 items-center justify-start mb-4 p-2 "; // justify-start for left alignment
-      itemsEl.parentNode.insertBefore(selectorRow, itemsEl);
+      selectorRow.className =
+        "flex gap-4 items-center  mb-4 p-2 bg-white"; // justify-start for left alignment
+      selectorsEl.appendChild(selectorRow);
     }
 
     // Extract current month and year from the path
@@ -123,7 +125,7 @@ export function mountApp(target = "#app") {
     const startYear = 2020;
     const endYear = 2030;
     let yearOptions = "";
-    
+
     for (let y = startYear; y <= endYear; y++) {
       yearOptions += `<option value="${y}" ${
         y == currentYear ? "selected" : ""
@@ -139,19 +141,30 @@ export function mountApp(target = "#app") {
     });
 
     selectorRow.innerHTML = `
-      <label class="font-semibold text-[#023e8a]">
-        Year:
-        <select id="year-selector" class="ml-1 px-2 py-1 rounded border">
-                  ${yearOptions}
-        </select>
-      </label>
-      <label class="font-semibold text-[#023e8a]">
-        Month:
-        <select id="month-selector" class="ml-1 px-2 py-1 rounded border">
-                  ${monthOptions}
-        </select>
-      </label>
+    <div class="flex-1">
+      <label class="font-semibold text-[#023e8a] text-sm">
       
+      <select id="year-selector" class="mt-1 px-2 py-2 rounded border border-gray-200 w-full bg-white focus:outline-none focus:ring-2 focus:ring-[#90e0ef]">
+        ${yearOptions}
+      </select>
+      </label>
+    </div>
+    <div class="flex-1">
+      <label class="font-semibold text-[#023e8a] text-sm">
+      
+      <select id="month-selector" class="mt-1 px-2 py-2 rounded border border-gray-200 w-full bg-white focus:outline-none focus:ring-2 focus:ring-[#90e0ef]">
+        ${monthOptions}
+      </select>
+      </label>
+    </div>
+    <div class="flex items-center">
+      <button id="add-record-btn" aria-label="Add record" title="Add record" class="w-10 h-10 inline-flex items-center justify-center rounded-full border border-gray-200 bg-white text-[#0077b6] shadow-sm hover:shadow-md hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-[#90e0ef]">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+      </button>
+    </div>
     `;
 
     // Add event listeners to update currentPath when selectors change
@@ -179,14 +192,14 @@ export function mountApp(target = "#app") {
       });
     });
 
-   /*  selectorRow.innerHTML += `
+    /*  selectorRow.innerHTML += `
       <button id="add-record-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer">New</button>
     `; */
 
     // Add summary box
     const summary = document.createElement("div");
     summary.className =
-      "mb-2 p-3 rounded bg-[#caf0f8] flex gap-6 justify-center items-center font-semibold text-[#023e8a]";
+      "mb-2 p-3 rounded bg-[#caf0f8] flex gap-6 justify-center items-center font-semibold text-[#023e8a] bg-white";
     // Get the current user's info from Firebase Auth
     //const auth = getAuth();
     const user = auth.currentUser || {};
@@ -197,14 +210,47 @@ export function mountApp(target = "#app") {
     const displayName = user.displayName || "Google user";
 
     summary.innerHTML = `
+    <!--- <div>
         <span class="mr-4 flex items-center">
           <img src="${photoURL}" alt="${displayName}" class="h-7 w-7 rounded-full bg-white " />
         </span>
         <span>Total Hours: <span class="text-[#0096c7]">${totalHoras}</span></span>
         <span>Total Studies: <span class="text-[#00b4d8]">${totalEst}</span></span>
-        <button id="add-record-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer">New</button>
+       </div> --->
+        
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="mr-4 flex items-center">
+          <img src="${photoURL}" alt="${displayName}" class="h-7 w-7 rounded-full bg-white " />
+        </span>
+                    <div class="mr-4">
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Welcome,</p>
+                        <p class="font-bold text-gray-900 ">${user.displayName}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 text-center">
+                    <div>
+                        <div
+                            class="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span class="material-symbols-outlined text-lg">schedule</span>
+                            <p class="text-xs">Hours</p>
+                        </div>
+                        <p class="text-lg font-bold text-gray-900 ">${totalHoras}</p>
+                    </div>
+                    <div>
+                        <div
+                            class="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span class="material-symbols-outlined text-lg">local_library</span>
+                            <p class="text-xs">Studies</p>
+                        </div>
+                        <p class="text-lg font-bold text-gray-900">${totalEst}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     `;
-    itemsEl.appendChild(summary);
+    totalsEl.appendChild(summary);
     const addRecordBtn = document.getElementById("add-record-btn");
     if (addRecordBtn) {
       addRecordBtn.addEventListener("click", () => {
@@ -219,7 +265,7 @@ export function mountApp(target = "#app") {
     // Create header row
     const header = document.createElement("li");
     header.className =
-      "p-3 border-b font-semibold flex justify-between items-center bg-[#00b4d8] text-white rounded-t";
+      "m-0 px-4 py-3 text-sm font-medium border-b font-semibold flex justify-between items-center bg-[#00b4d8] text-white rounded-t ";
     header.innerHTML = `
   <span class="flex-1 text-center">Day</span>
   <span class="flex-1 text-center">Hours</span>
@@ -239,15 +285,15 @@ export function mountApp(target = "#app") {
       noDataDiv.className = "text-center text-gray-500 py-4";
       itemsEl.appendChild(noDataDiv);
       //itemsEl.appendChild ="<div>No data</div>";
-      return
-    };
+      return;
+    }
     Object.entries(data).forEach(([key, value], idx) => {
       itemsCache[key] = value || {};
 
       const li = document.createElement("li");
-      li.className = `p-3 flex justify-between items-center transition ${
+      li.className = `m-0 p-3 flex justify-between items-center transition ${
         idx % 2 === 0 ? "bg-white" : "bg-white"
-      } hover:bg-[#caf0f8] rounded`;
+      } hover:bg-[#caf0f8] `;
 
       const day = value?.date?.split("-")[2] || "0";
       const horas = value?.horas || "0";
@@ -257,8 +303,12 @@ export function mountApp(target = "#app") {
         <span class="flex-1 text-center text-[#023e8a] font-medium">${escapeHtml(
           day
         )}</span>
-        <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(horas)}</span>
-        <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(est)}</span>
+        <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(
+          horas
+        )}</span>
+        <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(
+          est
+        )}</span>
         <div class="w-40 flex items-center justify-center gap-2">
           <button data-key="${key}" class="edit-btn p-2 rounded-md hover:bg-green-100 transition cursor-pointer" aria-label="Edit record" title="Edit">
         <!-- pencil icon -->
@@ -286,15 +336,15 @@ export function mountApp(target = "#app") {
     // attach delete handlers
     itemsEl.querySelectorAll(".remove-btn").forEach((btn) => {
       btn.addEventListener("click", async (e) => {
-      const key = btn.getAttribute("data-key");
-      if (!key) return;
-      // confirmation alert before deleting
-      if (!confirm("Are you sure you want to delete this record?")) return;
-      try {
-        await writeData(`${currentPath}/${key}`, null); // remove by setting null
-      } catch (err) {
-        console.error("remove failed", err);
-      }
+        const key = btn.getAttribute("data-key");
+        if (!key) return;
+        // confirmation alert before deleting
+        if (!confirm("Are you sure you want to delete this record?")) return;
+        try {
+          await writeData(`${currentPath}/${key}`, null); // remove by setting null
+        } catch (err) {
+          console.error("remove failed", err);
+        }
       });
     });
 
@@ -309,7 +359,6 @@ export function mountApp(target = "#app") {
     });
 
     // attach handler for the add button (guard against null)
-    
   }
 
   // subscribe realtime updates
@@ -318,10 +367,9 @@ export function mountApp(target = "#app") {
   });
 
   // open add dialog
-  
 
   // refresh manual read
-/*   refreshBtn.addEventListener("click", async () => {
+  /*   refreshBtn.addEventListener("click", async () => {
     try {
       const data = await getData(currentPath);
       console.log("Manual refresh data:", data);
@@ -414,7 +462,7 @@ function createEditDialog() {
   let currentEditKey = null;
   //const auth = getAuth();
   const user = auth.currentUser;
-  const userName = user?.displayName || user?.email?.split('@')[0] || 'Henry';
+  const userName = user?.displayName || user?.email?.split("@")[0] || "Henry";
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
@@ -626,7 +674,8 @@ function createAddDialog() {
   // expose open/close via window for simplicity
   window.__openAddDialog = () => {
     // Reset form fields
-    document.getElementById("add-date").value = "";
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("add-date").value = today;
     document.getElementById("add-horas-hours").value = "";
     document.getElementById("add-horas-minutes").value = "";
     document.getElementById("add-horas").value = "00:00";
