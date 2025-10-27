@@ -26,7 +26,7 @@ export function mountApp(target = "#app") {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  currentPath = `/control/Carolina/${currentYear}/${currentMonth}`;
+  currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
   console.log("Initial currentPath:", currentPath);
   const root = document.querySelector(target);
   if (!root) return;
@@ -46,9 +46,9 @@ export function mountApp(target = "#app") {
 
     <main class="w-full  mx-auto p-4 items-center justify-center flex">
       <div id="db-ui" class="space-y-4 w-full max-w-2xl">
-      <div id="selectors"></div>
-      <div id="totals"></div>
-        <ul id="items" class="space-y-2 border-gray-100 border-2"></ul>
+      <div id="selectors" class="rounded-full"></div>
+      <div id="totals" class="rounded-lg border border-gray-200 bg-white p-4"></div>
+      <ul id="items" class="space-y-2 rounded-lg border border-gray-200 "></ul>
       </div>
     </main>
   `;
@@ -77,6 +77,7 @@ export function mountApp(target = "#app") {
 
   function renderList(data) {
     itemsEl.innerHTML = "";
+    totalsEl.innerHTML = "";
 
     // Calculate sums
     let totalHoras = 0;
@@ -199,7 +200,7 @@ export function mountApp(target = "#app") {
     // Add summary box
     const summary = document.createElement("div");
     summary.className =
-      "mb-2 p-3 rounded bg-[#caf0f8] flex gap-6 justify-center items-center font-semibold text-[#023e8a] bg-white";
+      "flex gap-6 justify-center items-center font-semibold text-[#023e8a] bg-white";
     // Get the current user's info from Firebase Auth
     //const auth = getAuth();
     const user = auth.currentUser || {};
@@ -265,7 +266,7 @@ export function mountApp(target = "#app") {
     // Create header row
     const header = document.createElement("li");
     header.className =
-      "m-0 px-4 py-3 text-sm font-medium border-b font-semibold flex justify-between items-center bg-[#00b4d8] text-white rounded-t ";
+      "m-0 p-3 text-sm font-medium font-semibold flex justify-between items-center bg-[#00b4d8] text-white rounded-t ";
     header.innerHTML = `
   <span class="flex-1 text-center">Day</span>
   <span class="flex-1 text-center">Hours</span>
@@ -300,32 +301,23 @@ export function mountApp(target = "#app") {
       const est = value?.est || "0";
 
       li.innerHTML = `
-        <span class="flex-1 text-center text-[#023e8a] font-medium">${escapeHtml(
+        <span class="flex-1 text-center text-[#0096c7] font-medium">${escapeHtml(
           day
         )}</span>
         <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(
           horas
         )}</span>
-        <span class="flex-1 text-center text-[#00b4d8]">${escapeHtml(
+        <span class="flex-1 text-center text-[#0096c7]">${escapeHtml(
           est
         )}</span>
         <div class="w-40 flex items-center justify-center gap-2">
-          <button data-key="${key}" class="edit-btn p-2 rounded-md hover:bg-green-100 transition cursor-pointer" aria-label="Edit record" title="Edit">
+          <button data-key="${key}" class=" edit-btn text-[#023e8a] p-2 rounded-md hover:bg-green-100 transition cursor-pointer" aria-label="Edit record" title="Edit">
         <!-- pencil icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#006400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"></path>
-          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-        </svg>
+        <span class="material-symbols-outlined" style="font-size: 20px;">edit</span>
           </button>
-          <button data-key="${key}" class="remove-btn p-2 rounded-md hover:bg-[#e0fbff] transition cursor-pointer" aria-label="Delete record" title="Delete">
+          <button data-key="${key}" class="remove-btn text-[red] p-2 rounded-md hover:bg-[#e0fbff] transition cursor-pointer" aria-label="Delete record" title="Delete">
         <!-- trash icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#0077b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="3 6 5 6 21 6"></polyline>
-          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-          <path d="M10 11v6"></path>
-          <path d="M14 11v6"></path>
-          <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"></path>
-        </svg>
+        <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
           </button>
         </div>
       `;
