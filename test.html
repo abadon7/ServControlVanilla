@@ -248,6 +248,68 @@
             </div>
         </div>
     </div>
+    <div class="max-w-sm mx-auto p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-lg font-semibold text-gray-800 mb-4 text-center">Select Time</h2>
+
+  <!-- Hour Picker -->
+  <div class="grid grid-cols-4 gap-2 mb-6">
+    <label class="col-span-4 text-sm text-gray-600">Hour</label>
+    <button class="time-btn">01</button>
+    <button class="time-btn">02</button>
+    <button class="time-btn">03</button>
+    <button class="time-btn">04</button>
+    <button class="time-btn">05</button>
+    <button class="time-btn">06</button>
+    <button class="time-btn">07</button>
+    <button class="time-btn">08</button>
+    <button class="time-btn">09</button>
+    <button class="time-btn">10</button>
+    <button class="time-btn">11</button>
+    <button class="time-btn">12</button>
+  </div>
+
+  <!-- Minute Picker -->
+  <div class="grid grid-cols-6 gap-2 mb-6">
+    <label class="col-span-6 text-sm text-gray-600">Minutes</label>
+    <button class="time-btn">00</button>
+    <button class="time-btn">05</button>
+    <button class="time-btn">10</button>
+    <button class="time-btn">15</button>
+    <button class="time-btn">20</button>
+    <button class="time-btn">25</button>
+    <button class="time-btn">30</button>
+    <button class="time-btn">35</button>
+    <button class="time-btn">40</button>
+    <button class="time-btn">45</button>
+    <button class="time-btn">50</button>
+    <button class="time-btn">55</button>
+  </div>
+
+  <!-- Display Selected Time -->
+  <div class="text-center text-blue-600 font-semibold text-lg" id="selected-time">--:--</div>
+</div>
+
+<!-- Tailwind Button Style -->
+<style>
+  .
+</style>
+
+<script>
+  let selectedHour = "--";
+  let selectedMinute = "--";
+
+  document.querySelectorAll(".time-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const val = btn.textContent;
+      if (btn.parentElement.classList.contains("grid-cols-4")) {
+        selectedHour = val;
+      } else {
+        selectedMinute = val;
+      }
+      document.getElementById("selected-time").textContent = `${selectedHour}:${selectedMinute}`;
+    });
+  });
+</script>
 </body>
 
 </html>

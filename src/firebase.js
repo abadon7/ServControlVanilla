@@ -17,7 +17,10 @@ import {
   remove,
   onValue,
   get,
-  child
+  child,
+  orderByChild,
+  orderByValue,
+  query
 } from "firebase/database";
 
 // Replace these with your Firebase project's config
@@ -73,16 +76,33 @@ export function removeData(path) {
   return remove(ref(db, path));
 }
 
+// ...existing code...
 export function subscribeToPath(path, cb) {
-  const r = ref(db, path);
+  console.log("Subscribing to path:", path);
+  const r = query(ref(db, path), orderByChild("date"));
+  //console.log("Query created:", r);
+
+  // Attach listener and build a keyed object for the listener callback.
   const unsub = onValue(r, (snapshot) => {
-    cb(snapshot.val(), snapshot);
+    const data = {};
+    snapshot.forEach((child) => {
+      data[child.key] = child.val();
+    });
+    console.log("Snapshot data (keyed):", JSON.stringify(data));
+    //console.log("Sanpshot values", snapshot.val());
+    cb(data, snapshot);
+  }, (err) => {
+    console.error("onValue error:", err);
+    cb(null);
   });
-  return () => unsub(); // returns unsubscribe (Firebase onValue returns a function when used this way)
+
+  // Return the Firebase unsubscribe function so callers can call it.
+  return unsub;
 }
 
 export async function getData(path) {
-  const r = ref(db, path);
+  console.log("Getting data from path:", path);
+   const r = query(ref(db, path), orderByChild("date"));
   const snap = await get(r);
   return snap.exists() ? snap.val() : null;
 }

@@ -7,6 +7,7 @@ import {
   updateData,
   auth,
 } from "../firebase.js";
+import createTimePicker from '../components/TimePicker.js';
 //import { getAuth } from "firebase/auth";
 // cache current items for quick access when editing
 const itemsCache = {};
@@ -19,6 +20,7 @@ export function mountApp(target = "#app") {
   const userP = auth.currentUser;
   console.log("Current user:", userP);
   const firstName = userP?.displayName?.split(" ")[0]?.trim();
+   //const userName = "Carolina";
   const userName =
     firstName && firstName.toLowerCase() === "carito"
       ? "Carolina"
@@ -32,9 +34,12 @@ export function mountApp(target = "#app") {
   if (!root) return;
 
   root.innerHTML = `
-    <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200 dark:border-gray-700 px-4 py-3 bg-white">
+    <header class="w-full bg-white sticky top-0 z-40 border-b border-solid border-gray-200  px-4 py-3 bg-white">
       <div class="max-w-4xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
+        <a href="/" class="flex items-center" aria-label="ServControl home">
+          <img src="/logo.svg" alt="ServControl logo" class="h-10 w-10  bg-white shadow-sm" />
+        </a>
           <h1 class="text-2xl font-bold">ServControl</h1>
         </div>
         <div class="flex items-center gap-2">          
@@ -288,11 +293,13 @@ export function mountApp(target = "#app") {
       //itemsEl.appendChild ="<div>No data</div>";
       return;
     }
+    console.log("Data to render:", data);
     Object.entries(data).forEach(([key, value], idx) => {
+      //console.log("Rendering item:", key, value);
       itemsCache[key] = value || {};
 
       const li = document.createElement("li");
-      li.className = `m-0 p-3 flex justify-between items-center transition ${
+      li.className = `m-0 p-3 flex justify-between items-center transition border-b border-solid border-gray-200  ${
         idx % 2 === 0 ? "bg-white" : "bg-white"
       } hover:bg-[#caf0f8] `;
 
@@ -356,6 +363,7 @@ export function mountApp(target = "#app") {
   // subscribe realtime updates
   const unsubscribe = subscribeToPath(currentPath, (val) => {
     renderList(val);
+    
   });
 
   // open add dialog
@@ -453,12 +461,12 @@ function createEditDialog() {
 
   let currentEditKey = null;
   //const auth = getAuth();
-  const user = auth.currentUser;
+  /* const user = auth.currentUser;
   const userName = user?.displayName || user?.email?.split("@")[0] || "Henry";
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  let currentPath = `/control/${userName}/${currentYear}/${currentMonth}`;
+  let currentPath = `/control/${userName}/${currentYear}/${currentMonth}`; */
 
   editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -676,6 +684,19 @@ function createAddDialog() {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
     document.getElementById("add-date").focus();
+
+    /* const picker = createTimePicker({ initial: '08:30', step: 5 });
+    const container = modal.querySelector('.timepicker-container') || modal;
+    container.appendChild(picker.element); */
+
+    picker.onChange = (val) => {
+      console.log('time changed', val);
+    };
+    picker.onOk = (val) => {
+      console.log('OK clicked, value', val);
+      // set hidden input value and submit form or close dialog
+    };
+    picker.onCancel = () => closeAddDialog();
   };
 
   window.__closeAddDialog = () => {
