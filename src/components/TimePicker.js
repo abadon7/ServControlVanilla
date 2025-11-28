@@ -1,10 +1,8 @@
-// Minimal clock-style time picker (no dependencies)
+// Material Design 3 style time picker
 // Usage:
 // import createTimePicker from './components/TimePicker.js'
 // const picker = createTimePicker({ initial: '08:30' })
 // container.appendChild(picker.element)
-// picker.onChange = (value) => console.log(value) // value = '08:30'
-// picker.setValue('14:45')
 
 export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   const [initH, initM] = (initial || '00:00').split(':').map((v) => Number(v || 0));
@@ -13,55 +11,86 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   let mode = 'hour'; // 'hour' or 'minute'
 
   const element = document.createElement('div');
-  element.className = 'timepicker w-full max-w-sm mx-auto';
+  element.className = 'timepicker w-full max-w-[320px] mx-auto select-none';
   element.innerHTML = `
-    <div class="tp-display mb-3 text-center">
-      <div class="tp-value text-2xl font-semibold">${formatHHMM(hour, minute)}</div>
-      <div class="tp-mode text-sm text-gray-500">Select hour</div>
+    <!-- Display Section -->
+    <div class="tp-display mb-6 flex justify-center items-end gap-1">
+      <div class="tp-hour-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors bg-pink-100 text-pink-600">
+        ${pad(hour)}
+      </div>
+      <div class="text-[56px] leading-none font-medium text-gray-800 pb-2">:</div>
+      <div class="tp-minute-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors text-gray-800 hover:bg-gray-100">
+        ${pad(minute)}
+      </div>
     </div>
-    <div class="tp-clock relative mx-auto" style="width:220px;height:220px">
-      <svg viewBox="0 0 220 220" width="220" height="220" class="block">
-        <defs>
-          <filter id="tp-shadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.12" />
-          </filter>
-        </defs>
-        <g transform="translate(110,110)">
-          <circle r="100" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1" />
-          <g class="tp-numbers"></g>
-          <g class="tp-minute-ticks"></g>
-          <line class="tp-hand" x1="0" y1="0" x2="0" y2="-60" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" />
-          <circle r="4" fill="#0ea5e9" />
+
+    <!-- Clock Face Section -->
+    <div class="tp-clock relative mx-auto" style="width:200px;height:200px">
+      <div class="absolute inset-0 rounded-full bg-gray-100"></div>
+      <svg viewBox="0 0 256 256" width="200" height="200" class="block relative z-10 pointer-events-none">
+        <g transform="translate(128,128)">
+          <!-- Center Dot -->
+          <circle r="4" fill="#E91E63" />
+          
+          <!-- Hand Group -->
+          <g class="tp-hand-group" transition="transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1)">
+            <line x1="0" y1="0" x2="0" y2="-96" stroke="#E91E63" stroke-width="2" />
+            <circle cx="0" cy="-96" r="16" fill="#E91E63" />
+            <circle cx="0" cy="-96" r="2" fill="#fff" class="tp-hand-dot hidden" />
+          </g>
+          
+          <!-- Numbers Container -->
+          <g class="tp-numbers pointer-events-auto"></g>
+          <g class="tp-minute-ticks pointer-events-auto" style="display:none"></g>
         </g>
       </svg>
     </div>
-    <div class="tp-actions mt-3 flex gap-2 justify-center">
-      <button type="button" class="tp-btn-cancel px-3 py-1 rounded bg-gray-100">Cancel</button>
-      <button type="button" class="tp-btn-now px-3 py-1 rounded bg-gray-100">Now</button>
-      <button type="button" class="tp-btn-ok px-3 py-1 rounded bg-blue-600 text-white">OK</button>
+
+    <!-- Actions -->
+    <div class="tp-actions mt-6 flex gap-4 justify-between items-center px-4">
+      <button type="button" class="tp-btn-now text-sm font-medium text-pink-600 hover:bg-pink-50 px-3 py-2 rounded-lg transition-colors">
+        <span class="material-symbols-outlined align-middle text-lg mr-1">schedule</span>Now
+      </button>
+      <div class="flex gap-2">
+        <button type="button" class="tp-btn-cancel text-sm font-medium text-pink-600 hover:bg-pink-50 px-4 py-2 rounded-full transition-colors">Cancel</button>
+        <button type="button" class="tp-btn-ok text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-full shadow-sm shadow-pink-200 transition-colors">OK</button>
+      </div>
     </div>
   `;
 
-  const displayEl = element.querySelector('.tp-value');
-  const modeEl = element.querySelector('.tp-mode');
+  const hourEl = element.querySelector('.tp-hour-display');
+  const minuteEl = element.querySelector('.tp-minute-display');
   const numbersGroup = element.querySelector('.tp-numbers');
   const ticksGroup = element.querySelector('.tp-minute-ticks');
-  const hand = element.querySelector('.tp-hand');
+  const handGroup = element.querySelector('.tp-hand-group');
 
-  // Build hour numbers (1-12) around dial. We'll use AM/PM logic to produce 24h value.
-  const radius = 80;
+  // Build hour numbers (1-12)
+  const radius = 96;
   for (let i = 1; i <= 12; i++) {
     const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
     const x = Math.round(Math.cos(angle) * radius);
     const y = Math.round(Math.sin(angle) * radius);
+
+    // Hit area for click
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    hit.setAttribute('cx', String(x));
+    hit.setAttribute('cy', String(y));
+    hit.setAttribute('r', '20');
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('data-hour', String(i % 12));
+    hit.style.cursor = 'pointer';
+    numbersGroup.appendChild(hit);
+
+    // Text
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', String(x));
-    text.setAttribute('y', String(y + 6));
+    text.setAttribute('y', String(y + 5)); // optical center
     text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('font-size', '14');
-    text.setAttribute('fill', '#0f172a');
-    text.setAttribute('data-hour', String(i % 12));
-    text.style.cursor = 'pointer';
+    text.setAttribute('font-size', '16');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', '#1f2937');
+    text.setAttribute('class', 'tp-number-text pointer-events-none transition-colors duration-200');
+    text.setAttribute('data-val', String(i % 12));
     text.textContent = String(i === 12 ? 12 : i);
     numbersGroup.appendChild(text);
   }
@@ -69,16 +98,29 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   // Build minute ticks (every step minutes)
   for (let m = 0; m < 60; m += step) {
     const angle = (m / 60) * Math.PI * 2 - Math.PI / 2;
-    const x = Math.round(Math.cos(angle) * (radius - 18));
-    const y = Math.round(Math.sin(angle) * (radius - 18));
+    const x = Math.round(Math.cos(angle) * radius);
+    const y = Math.round(Math.sin(angle) * radius);
+
+    // Hit area
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    hit.setAttribute('cx', String(x));
+    hit.setAttribute('cy', String(y));
+    hit.setAttribute('r', '20');
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('data-minute', String(m));
+    hit.style.cursor = 'pointer';
+    ticksGroup.appendChild(hit);
+
+    // Text
     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     text.setAttribute('x', String(x));
-    text.setAttribute('y', String(y + 4));
+    text.setAttribute('y', String(y + 5));
     text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('font-size', '12');
-    text.setAttribute('fill', '#0f172a');
-    text.setAttribute('data-minute', String(m));
-    text.style.cursor = 'pointer';
+    text.setAttribute('font-size', '16');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', '#1f2937');
+    text.setAttribute('class', 'tp-tick-text pointer-events-none transition-colors duration-200');
+    text.setAttribute('data-val', String(m));
     text.textContent = String(m).padStart(2, '0');
     ticksGroup.appendChild(text);
   }
@@ -89,27 +131,37 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   showMode(mode);
 
   // events
+  hourEl.addEventListener('click', () => showMode('hour'));
+  minuteEl.addEventListener('click', () => showMode('minute'));
+
   numbersGroup.addEventListener('click', (e) => {
     const target = e.target;
     const hrAttr = target.getAttribute && target.getAttribute('data-hour');
     if (!hrAttr) return;
+
     let h12 = Number(hrAttr);
     if (h12 === 0) h12 = 12;
-    // detect AM/PM by current hour
+
+    // Smart AM/PM: if current hour is PM, keep it PM unless user explicitly changes (not handled here, simple logic)
+    // Actually, standard material picker toggles AM/PM separately. 
+    // For 24h simplicity here: we preserve the current AM/PM state.
     const isPM = hour >= 12;
     const newHour = (isPM ? (h12 % 12) + 12 : h12 % 12) % 24;
+
     hour = newHour;
-    mode = 'minute';
-    showMode(mode);
     updateDisplay();
     updateHand();
     fireChange();
+
+    // Auto-advance to minute
+    setTimeout(() => showMode('minute'), 300);
   });
 
   ticksGroup.addEventListener('click', (e) => {
     const target = e.target;
     const mAttr = target.getAttribute && target.getAttribute('data-minute');
     if (!mAttr) return;
+
     minute = Number(mAttr) % 60;
     updateDisplay();
     updateHand();
@@ -120,8 +172,7 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
     const now = new Date();
     hour = now.getHours();
     minute = Math.floor(now.getMinutes() / step) * step;
-    mode = 'hour';
-    showMode(mode);
+    showMode('hour');
     updateDisplay();
     updateHand();
     fireChange();
@@ -137,29 +188,67 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
 
   function showMode(m) {
     mode = m;
-    modeEl.textContent = m === 'hour' ? 'Select hour' : 'Select minute';
-    // show/hide groups
+
+    // Toggle Groups
     numbersGroup.style.display = m === 'hour' ? 'block' : 'none';
     ticksGroup.style.display = m === 'minute' ? 'block' : 'none';
+
+    // Toggle Display Styles
+    if (m === 'hour') {
+      hourEl.classList.add('bg-pink-100', 'text-pink-600');
+      hourEl.classList.remove('text-gray-800', 'hover:bg-gray-100');
+
+      minuteEl.classList.remove('bg-pink-100', 'text-pink-600');
+      minuteEl.classList.add('text-gray-800', 'hover:bg-gray-100');
+    } else {
+      minuteEl.classList.add('bg-pink-100', 'text-pink-600');
+      minuteEl.classList.remove('text-gray-800', 'hover:bg-gray-100');
+
+      hourEl.classList.remove('bg-pink-100', 'text-pink-600');
+      hourEl.classList.add('text-gray-800', 'hover:bg-gray-100');
+    }
+    updateHand(); // refresh hand position for new mode
   }
 
   function updateDisplay() {
-    displayEl.textContent = formatHHMM(hour, minute);
+    hourEl.textContent = pad(hour);
+    minuteEl.textContent = pad(minute);
   }
 
   function updateHand() {
-    // angle depends on mode
-    let angle;
+    let val, max;
     if (mode === 'hour') {
-      const h12 = hour % 12;
-      angle = ((h12) / 12) * Math.PI * 2 - Math.PI / 2;
+      val = hour % 12;
+      max = 12;
     } else {
-      angle = (minute / 60) * Math.PI * 2 - Math.PI / 2;
+      val = minute;
+      max = 60;
     }
-    const x = Math.cos(angle) * -60; // negative because SVG y is inverted in our earlier transform
-    const y = Math.sin(angle) * -60;
-    hand.setAttribute('x2', String(-Math.cos(angle) * 60));
-    hand.setAttribute('y2', String(-Math.sin(angle) * 60));
+
+    const angleDeg = (val / max) * 360;
+    handGroup.style.transform = `rotate(${angleDeg}deg)`;
+
+    // Update text colors based on selection
+    // Reset all
+    element.querySelectorAll('.tp-number-text, .tp-tick-text').forEach(el => el.setAttribute('fill', '#1f2937'));
+
+    // Highlight selected
+    const selector = mode === 'hour' ? `.tp-number-text[data-val="${val}"]` : `.tp-tick-text[data-val="${val}"]`;
+    const selectedText = element.querySelector(selector);
+    if (selectedText) {
+      selectedText.setAttribute('fill', '#ffffff');
+      // Counter-rotate text so it stays upright? No, standard material rotates the whole hand.
+      // But the text inside the bubble needs to be upright relative to the page? 
+      // Actually, standard material just highlights the text on the dial.
+      // Since our hand covers the text, we need the text ON TOP or the hand BEHIND.
+      // In this SVG, hand is drawn BEFORE numbers (z-index wise in SVG order).
+      // Wait, line 30-34 in original was hand AFTER numbers.
+      // Here I put hand BEFORE numbers (lines 34-38 vs 41).
+      // So the hand is BEHIND the text.
+      // The circle at the tip is filled #E91E63.
+      // So the text will be on top of the pink circle.
+      // We set text fill to white.
+    }
   }
 
   function getValue() {

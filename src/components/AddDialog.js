@@ -1,4 +1,6 @@
 import { pushData } from "../firebase.js";
+import { showNotification } from "./Notification.js";
+import createTimePicker from "./TimePicker.js";
 
 export function createAddDialog() {
   if (document.getElementById("add-dialog")) return;
@@ -26,33 +28,8 @@ export function createAddDialog() {
 
         <!-- Hours -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Hours (hours : minutes)</label>
-          <div class="flex gap-3">
-            <div class="relative w-1/2">
-              <input
-                id="add-horas-hours"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="00"
-                class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all text-center"
-              />
-              <span class="absolute right-3 top-2.5 text-gray-400 text-xs font-medium">hr</span>
-            </div>
-            <span class="text-gray-400 font-bold self-center">:</span>
-            <div class="relative w-1/2">
-              <input
-                id="add-horas-minutes"
-                type="number"
-                min="0"
-                max="59"
-                step="1"
-                placeholder="00"
-                class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all text-center"
-              />
-              <span class="absolute right-3 top-2.5 text-gray-400 text-xs font-medium">min</span>
-            </div>
-          </div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Hours</label>
+          <div id="add-timepicker-container" class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex justify-center"></div>
           <input id="add-horas" type="hidden" />
         </div>
 
@@ -76,8 +53,19 @@ export function createAddDialog() {
   const addForm = modal.querySelector("#add-form");
   const cancelBtn = modal.querySelector("#add-cancel");
   const closeXBtn = modal.querySelector("#add-close-x");
-  const addHorasHours = modal.querySelector("#add-horas-hours");
-  const addHorasMinutes = modal.querySelector("#add-horas-minutes");
+  const timePickerContainer = modal.querySelector("#add-timepicker-container");
+
+  // Initialize TimePicker
+  const picker = createTimePicker({ initial: "00:00" });
+  timePickerContainer.appendChild(picker.element);
+
+  // Hide internal buttons of the picker since we have form buttons
+  const pickerButtons = picker.element.querySelector('.tp-actions');
+  if (pickerButtons) pickerButtons.style.display = 'none';
+
+  picker.onChange = (val) => {
+    document.getElementById("add-horas").value = val;
+  };
 
   let currentPath = null;
 
@@ -106,17 +94,11 @@ export function createAddDialog() {
         createdAt: Date.now(),
       });
       closeAddDialog();
+      showNotification("Record added successfully");
     } catch (err) {
       console.error("add failed", err);
-      alert("Add failed, see console.");
+      showNotification("Failed to add record", "error");
     }
-  });
-
-  addHorasHours.addEventListener("input", () => {
-    updateAddDecimalHours();
-  });
-  addHorasMinutes.addEventListener("input", () => {
-    updateAddDecimalHours();
   });
 
   cancelBtn.addEventListener("click", () => {
@@ -137,9 +119,11 @@ export function createAddDialog() {
     // Reset form fields
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("add-date").value = today;
-    document.getElementById("add-horas-hours").value = "";
-    document.getElementById("add-horas-minutes").value = "";
+
+    // Reset picker
+    picker.setValue("00:00");
     document.getElementById("add-horas").value = "00:00";
+
     document.getElementById("add-est").value = "";
 
     modal.classList.remove("hidden");
@@ -161,16 +145,4 @@ export function openAddDialog(path) {
 
 function closeAddDialog() {
   if (window.__closeAddDialog) window.__closeAddDialog();
-}
-
-function updateAddDecimalHours() {
-  const hours = Number(document.getElementById("add-horas-hours").value || 0);
-  const minutes = Number(
-    document.getElementById("add-horas-minutes").value || 0
-  );
-  const formattedHours = String(hours).padStart(2, "0");
-  const formattedMinutes = String(minutes).padStart(2, "0");
-
-  const timeString = `${formattedHours}:${formattedMinutes}`;
-  document.getElementById("add-horas").value = timeString;
 }
