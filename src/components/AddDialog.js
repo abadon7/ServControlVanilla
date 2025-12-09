@@ -1,5 +1,4 @@
 import { pushData } from "../firebase.js";
-import { showNotification } from "./Notification.js";
 import createTimePicker from "./TimePicker.js";
 
 export function createAddDialog() {
@@ -33,16 +32,25 @@ export function createAddDialog() {
           <input id="add-horas" type="hidden" />
         </div>
 
-        <!-- Studies -->
+        <!-- Studies (Multiple) -->
         <div>
-          <label for="add-est" class="block text-sm font-medium text-gray-700 mb-1.5">Studies</label>
-          <input id="add-est" type="number" min="0" step="1" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all" />
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Study Names</label>
+          <div class="flex gap-2 mb-2">
+            <input id="add-est-input" type="text" placeholder="Enter name" class="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block p-2.5 transition-all" />
+            <button type="button" id="add-name-btn" class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl hover:bg-pink-200 font-medium transition-colors">Add</button>
+          </div>
+          
+          <!-- Pending List -->
+          <div id="pending-names-list" class="space-y-2 max-h-32 overflow-y-auto">
+            <!-- Items will be added here -->
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Add multiple names. Hours will be applied to the first record.</p>
         </div>
 
         <!-- Buttons -->
         <div class="flex justify-end gap-3 pt-2">
           <button type="button" id="add-cancel" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:ring-2 focus:ring-gray-300 transition-all cursor-pointer">Cancel</button>
-          <button type="submit" id="add-save" class="px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-xl hover:bg-pink-700 focus:ring-4 focus:ring-pink-200 transition-all shadow-sm shadow-pink-200 cursor-pointer">Add Record</button>
+          <button type="submit" id="add-save" class="px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-xl hover:bg-pink-700 focus:ring-4 focus:ring-pink-200 transition-all shadow-sm shadow-pink-200 cursor-pointer">Save All</button>
         </div>
       </form>
     </div>
@@ -54,12 +62,15 @@ export function createAddDialog() {
   const cancelBtn = modal.querySelector("#add-cancel");
   const closeXBtn = modal.querySelector("#add-close-x");
   const timePickerContainer = modal.querySelector("#add-timepicker-container");
+  const addNameBtn = modal.querySelector("#add-name-btn");
+  const nameInput = modal.querySelector("#add-est-input");
+  const pendingList = modal.querySelector("#pending-names-list");
 
   // Initialize TimePicker
   const picker = createTimePicker({ initial: "00:00" });
   timePickerContainer.appendChild(picker.element);
 
-  // Hide internal buttons of the picker since we have form buttons
+  // Hide internal buttons
   const pickerButtons = picker.element.querySelector('.tp-actions');
   if (pickerButtons) pickerButtons.style.display = 'none';
 
@@ -68,36 +79,101 @@ export function createAddDialog() {
   };
 
   let currentPath = null;
+  let validateFn = null;
+  let pendingNames = [];
+
+  const renderPendingNames = () => {
+    pendingList.innerHTML = "";
+    pendingNames.forEach((name, index) => {
+      const div = document.createElement("div");
+      div.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg border border-gray-100";
+      div.innerHTML = `
+            <span class="text-sm text-gray-700 font-medium">${name}</span>
+            <button type="button" data-index="${index}" class="remove-pending-btn text-gray-400 hover:text-red-500">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        `;
+      pendingList.appendChild(div);
+    });
+
+    // Attach remove handlers
+    pendingList.querySelectorAll(".remove-pending-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.getAttribute("data-index"));
+        pendingNames.splice(idx, 1);
+        renderPendingNames();
+      });
+    });
+  };
+
+  addNameBtn.addEventListener("click", () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    const date = document.getElementById("add-date").value;
+
+    // Validate against DB
+    if (validateFn) {
+      const error = validateFn(date, name);
+      if (error) {
+        alert(error);
+        return;
+      }
+    }
+
+    // Validate against pending list
+    if (pendingNames.some(n => n.toLowerCase() === name.toLowerCase())) {
+      alert("Name already in pending list.");
+      return;
+    }
+
+    pendingNames.push(name);
+    nameInput.value = "";
+    renderPendingNames();
+    nameInput.focus();
+  });
+
+  // Allow Enter key to add name
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addNameBtn.click();
+    }
+  });
 
   addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const date = document.getElementById("add-date").value.trim();
     const horas = document.getElementById("add-horas").value || "00:00";
-    const est = parseInt(document.getElementById("add-est").value, 10) || 0;
 
     if (!date) {
       alert("Please enter a date");
       return;
     }
+    /* if (pendingNames.length === 0) {
+      alert("Please add at least one name");
+      return;
+    } */
+
     if (!currentPath) {
       console.error("No current path set for adding record");
       return;
     }
 
-    console.log("Adding new record:", { date, horas, est });
+    console.log("Adding records:", { date, horas, names: pendingNames });
 
     try {
+      // Save as a single record with array of names
       await pushData(currentPath, {
         date,
         horas,
-        est,
+        est: pendingNames, // Save array
         createdAt: Date.now(),
       });
       closeAddDialog();
-      showNotification("Record added successfully");
     } catch (err) {
       console.error("add failed", err);
-      showNotification("Failed to add record", "error");
+      alert("Add failed, see console.");
     }
   });
 
@@ -114,8 +190,12 @@ export function createAddDialog() {
   });
 
   // expose open/close via window for simplicity
-  window.__openAddDialog = (path) => {
+  window.__openAddDialog = (path, validator) => {
     currentPath = path;
+    validateFn = validator;
+    pendingNames = [];
+    renderPendingNames();
+
     // Reset form fields
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("add-date").value = today;
@@ -124,7 +204,7 @@ export function createAddDialog() {
     picker.setValue("00:00");
     document.getElementById("add-horas").value = "00:00";
 
-    document.getElementById("add-est").value = "";
+    document.getElementById("add-est-input").value = "";
 
     modal.classList.remove("hidden");
     modal.classList.add("flex");
@@ -133,14 +213,16 @@ export function createAddDialog() {
 
   window.__closeAddDialog = () => {
     currentPath = null;
+    validateFn = null;
+    pendingNames = [];
     modal.classList.remove("flex");
     modal.classList.add("hidden");
   };
 }
 
-export function openAddDialog(path) {
+export function openAddDialog(path, validator) {
   if (!document.getElementById("add-dialog")) createAddDialog();
-  window.__openAddDialog(path);
+  window.__openAddDialog(path, validator);
 }
 
 function closeAddDialog() {
