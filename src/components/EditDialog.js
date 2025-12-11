@@ -35,8 +35,16 @@ export function createEditDialog() {
 
         <!-- Studies -->
         <div>
-          <label for="edit-est" class="block text-sm font-medium text-gray-700 mb-1.5">Studies</label>
-          <input id="edit-est" type="number" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all" />
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Study Names</label>
+          <div class="flex gap-2 mb-2">
+            <input id="edit-est-input" type="text" placeholder="Enter name" class="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block p-2.5 transition-all" />
+            <button type="button" id="edit-name-btn" class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl hover:bg-pink-200 font-medium transition-colors">Add</button>
+          </div>
+          
+          <!-- Pending List -->
+          <div id="edit-pending-names-list" class="space-y-2 max-h-32 overflow-y-auto">
+            <!-- Items will be added here -->
+          </div>
         </div>
 
         <!-- Buttons -->
@@ -54,6 +62,9 @@ export function createEditDialog() {
   const cancelBtn = modal.querySelector("#edit-cancel");
   const closeXBtn = modal.querySelector("#edit-close-x");
   const timePickerContainer = modal.querySelector("#edit-timepicker-container");
+  const editNameBtn = modal.querySelector("#edit-name-btn");
+  const nameInput = modal.querySelector("#edit-est-input");
+  const pendingList = modal.querySelector("#edit-pending-names-list");
 
   // Initialize TimePicker
   const picker = createTimePicker({ initial: "00:00" });
@@ -69,20 +80,74 @@ export function createEditDialog() {
 
   let currentEditKey = null;
   let currentPath = null;
+  let pendingNames = [];
+
+  const renderPendingNames = () => {
+    pendingList.innerHTML = "";
+    pendingNames.forEach((name, index) => {
+      const div = document.createElement("div");
+      div.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg border border-gray-100";
+      div.innerHTML = `
+            <span class="text-sm text-gray-700 font-medium">${name}</span>
+            <button type="button" data-index="${index}" class="remove-pending-btn text-gray-400 hover:text-red-500">
+                <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+        `;
+      pendingList.appendChild(div);
+    });
+
+    // Attach remove handlers
+    pendingList.querySelectorAll(".remove-pending-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = parseInt(btn.getAttribute("data-index"));
+        pendingNames.splice(idx, 1);
+        renderPendingNames();
+      });
+    });
+  };
+
+  editNameBtn.addEventListener("click", () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    // Validate against pending list
+    if (pendingNames.some(n => n.toLowerCase() === name.toLowerCase())) {
+      alert("Name already in list.");
+      return;
+    }
+
+    pendingNames.push(name);
+    nameInput.value = "";
+    renderPendingNames();
+    nameInput.focus();
+  });
+
+  // Allow Enter key to add name
+  nameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      editNameBtn.click();
+    }
+  });
 
   editForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const date = document.getElementById("edit-date").value.trim();
     const horas = document.getElementById("edit-horas").value || 0;
-    const est = parseInt(document.getElementById("edit-est").value, 10) || 0;
+
     if (!currentEditKey || !currentPath) return closeDialog();
-    console.log("Would update:", { date, horas, est });
+    /* if (pendingNames.length === 0) {
+      alert("Please add at least one name");
+      return;
+    } */
+
+    console.log("Would update:", { date, horas, est: pendingNames });
 
     try {
       await updateData(`${currentPath}/${currentEditKey}`, {
         date,
         horas,
-        est,
+        est: pendingNames
       });
       showNotification("Record updated successfully");
     } catch (err) {
@@ -117,8 +182,20 @@ export function createEditDialog() {
 
     document.getElementById("edit-date").value =
       data && data.date ? data.date : "";
-    document.getElementById("edit-est").value =
-      data && data.est ? data.est : "";
+
+    // Initialize pending names
+    pendingNames = [];
+    if (data && data.est) {
+      if (Array.isArray(data.est)) {
+        pendingNames = [...data.est];
+      } else {
+        // Handle legacy string or comma-separated string
+        pendingNames = String(data.est).split(",").map(s => s.trim()).filter(s => s.length > 0);
+      }
+    }
+    renderPendingNames();
+    document.getElementById("edit-est-input").value = "";
+
     modal.classList.remove("hidden");
     modal.classList.add("flex");
     document.getElementById("edit-date").focus();

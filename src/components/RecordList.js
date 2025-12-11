@@ -58,12 +58,20 @@ export function createRecordList(target, initialPath, userName) {
     totalsEl.innerHTML = "";
 
     // Calculate sums
+    // Calculate sums
     let totalHoras = 0;
     let totalEst = 0;
     if (data) {
       Object.values(data).forEach((value) => {
         totalHoras += parseFloat(value && value.horas ? value.horas : 0) || 0;
-        totalEst += Number(value && value.est ? value.est : 0);
+        // Count number of studies (records with a name or array of names)
+        if (value && value.est) {
+          if (Array.isArray(value.est)) {
+            totalEst += value.est.length;
+          } else {
+            totalEst += 1;
+          }
+        }
       });
     }
 
@@ -93,7 +101,24 @@ export function createRecordList(target, initialPath, userName) {
         monthOptions += `<option value="${idx}" ${idx == currentMonth ? "selected" : ""}>${monthName}</option>`;
       });
 
+      // User Selector Options (Only if current user is Henry)
+      let userSelectorHTML = "";
+      if (userName === "Henry") {
+        userSelectorHTML = `
+          <div class="relative">
+            <select id="user-selector" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
+              <option value="Henry" selected>Henry</option>
+              <option value="Carolina">Carolina</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+              <span class="material-symbols-outlined text-sm">expand_more</span>
+            </div>
+          </div>
+        `;
+      }
+
       selectorsEl.innerHTML = `
+          ${userSelectorHTML}
           <div class="relative">
             <select id="month-selector" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
               ${monthOptions}
@@ -114,25 +139,47 @@ export function createRecordList(target, initialPath, userName) {
 
       const yearSelector = selectorsEl.querySelector("#year-selector");
       const monthSelector = selectorsEl.querySelector("#month-selector");
+      const userSelector = selectorsEl.querySelector("#user-selector");
 
       const updatePath = () => {
         const selectedYear = yearSelector.value;
         const selectedMonth = monthSelector.value;
-        currentPath = `/control/${userName}/${selectedYear}/${selectedMonth}`;
+        // Use selected user if selector exists, otherwise fallback to initial userName
+        const selectedUser = userSelector ? userSelector.value : userName;
+
+        currentPath = `/control/${selectedUser}/${selectedYear}/${selectedMonth}`;
         if (unsubscribe) unsubscribe();
         unsubscribe = subscribeToPath(currentPath, (val) => renderList(val));
       };
 
       yearSelector.addEventListener("change", updatePath);
       monthSelector.addEventListener("change", updatePath);
+      if (userSelector) {
+        userSelector.addEventListener("change", updatePath);
+      }
     }
 
     // Add Button Handler
-    // We remove old listeners by cloning or just re-adding carefully. 
-    // Since renderList is called often, we should attach this outside or check.
-    // Actually, addRecordBtn is static in the container, so we can attach once outside renderList logic if we want, 
-    // but we need currentPath. Let's just update the onclick handler wrapper.
-    addRecordBtn.onclick = () => openAddDialog(currentPath);
+    // Validator function to check for duplicates (Month-wide)
+    const validator = (date, name) => {
+      if (!itemsCache) return null;
+      const normalizedName = name.toLowerCase().trim();
+      // Check if name exists anywhere in the current month (itemsCache)
+      const duplicate = Object.values(itemsCache).find(item => {
+        if (Array.isArray(item.est)) {
+          return item.est.some(n => String(n).toLowerCase().trim() === normalizedName);
+        }
+        const itemEst = item.est !== undefined && item.est !== null ? String(item.est) : "";
+        return itemEst.toLowerCase().trim() === normalizedName;
+      });
+
+      if (duplicate) {
+        return `The name "${name}" already exists in this month (on ${duplicate.date}).`;
+      }
+      return null;
+    };
+
+    addRecordBtn.onclick = () => openAddDialog(currentPath, validator);
 
 
     // Reset cache
@@ -154,12 +201,20 @@ export function createRecordList(target, initialPath, userName) {
 
       const day = value?.date?.split("-")[2] || "0";
       const horas = value?.horas || "0";
-      const est = value?.est || "0";
+      let estCount = 0;
+
+      if (value?.est) {
+        if (Array.isArray(value.est)) {
+          estCount = value.est.length;
+        } else if (String(value.est).trim().length > 0) {
+          estCount = 1;
+        }
+      }
 
       tr.innerHTML = `
-        <td class="px-4 py-4 font-medium text-gray-900">${escapeHtml(day)}</td>
-        <td class="px-4 py-4 text-gray-600">${escapeHtml(horas)}</td>
-        <td class="px-4 py-4 text-gray-600">${escapeHtml(est)}</td>
+        <td class="px-6 py-4 font-medium text-gray-900">${escapeHtml(day)}</td>
+        <td class="px-6 py-4 text-gray-600">${escapeHtml(horas)}</td>
+        <td class="px-6 py-4 text-gray-600 font-medium">${estCount}</td>
         <td class="px-4 py-4 text-right">
           <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
             <button data-key="${key}" class="edit-btn p-2 text-gray-400 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-colors" title="Edit">

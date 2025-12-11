@@ -1,7 +1,10 @@
 import tailwindcss from '@tailwindcss/vite'
-export default {
+import { defineConfig } from 'vite'
+
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : '/ServControlVanilla/',
   // config options
-   plugins: [
+  plugins: [
     tailwindcss(),
   ],
-}
+}))
