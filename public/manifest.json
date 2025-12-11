@@ -1,13 +1,13 @@
 {
     "name": "ServControl",
     "short_name": "ServControl",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#ffffff",
     "icons": [
         {
-            "src": "/logo.svg",
+            "src": "logo.svg",
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any maskable"

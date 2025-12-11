@@ -136,10 +136,10 @@ export function createEditDialog() {
     const horas = document.getElementById("edit-horas").value || 0;
 
     if (!currentEditKey || !currentPath) return closeDialog();
-    if (pendingNames.length === 0) {
+    /* if (pendingNames.length === 0) {
       alert("Please add at least one name");
       return;
-    }
+    } */
 
     console.log("Would update:", { date, horas, est: pendingNames });
 

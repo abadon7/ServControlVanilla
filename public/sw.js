@@ -1,9 +1,9 @@
 const CACHE_NAME = 'servcontrol-v2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/logo.svg',
-    '/vite.svg'
+    './',
+    './index.html',
+    './logo.svg',
+    './vite.svg'
 ];
 
 self.addEventListener('install', (event) => {
