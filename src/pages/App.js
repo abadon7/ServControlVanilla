@@ -36,6 +36,10 @@ export function mountApp(target = "#app") {
   // Create Record List (which includes Summary and Selectors)
   createRecordList(main, initialPath, userName);
 
+  Notification.requestPermission().then((result) => {
+    console.log(result);
+  });
+
   // Initialize Dialogs (they attach themselves to body)
   createEditDialog();
   createAddDialog();
