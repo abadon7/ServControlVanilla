@@ -1,14 +1,14 @@
 import { auth } from "../firebase.js";
 
 export function createSummary(target, totalHoras, totalEst) {
-    const summary = document.createElement("div");
-    summary.className = "w-full mb-8";
+  const summary = document.createElement("div");
+  summary.className = "w-full mb-8";
 
-    const user = auth.currentUser || {};
-    const photoURL = user.photoURL || "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg";
-    const displayName = user.displayName || "Google user";
+  const user = auth.currentUser || {};
+  const photoURL = user.photoURL || "https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg";
+  const displayName = user.displayName || "Google user";
 
-    summary.innerHTML = `
+  summary.innerHTML = `
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
       <!-- Welcome Card -->
@@ -45,7 +45,16 @@ export function createSummary(target, totalHoras, totalEst) {
     </div>
   `;
 
-    // Clear previous content
-    target.innerHTML = '';
-    target.appendChild(summary);
+  // Clear previous content
+  target.innerHTML = '';
+  target.appendChild(summary);
+
+  const date = new Date();
+  const day = date.getDate();
+
+  if (day === 1) {
+    const img = "book.svg";
+    const text = `Hello ${displayName}! Your report is ready! ${totalHoras} hours and ${totalEst} studies`;
+    const notification = new Notification("Report", { body: text, icon: img });
+  }
 }
