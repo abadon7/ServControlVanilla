@@ -12,32 +12,32 @@ export function createSummary(target, totalHoras, totalEst) {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
       <!-- Welcome Card -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center gap-4">
-        <img src="${photoURL}" alt="${displayName}" class="h-14 w-14 rounded-full border-2 border-pink-100 shadow-sm" />
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4 transition-colors duration-200">
+        <img src="${photoURL}" alt="${displayName}" class="h-14 w-14 rounded-full border-2 border-pink-100 dark:border-pink-900/30 shadow-sm" />
         <div>
-          <p class="text-sm font-medium text-gray-500">Welcome back,</p>
-          <h2 class="text-xl font-bold text-gray-900 truncate">${displayName}</h2>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Welcome back,</p>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 truncate">${displayName}</h2>
         </div>
       </div>
 
       <!-- Hours Card -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between transition-colors duration-200">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Total Hours</p>
-          <p class="text-3xl font-bold text-gray-900">${totalHoras}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Hours</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">${totalHoras}</p>
         </div>
-        <div class="h-12 w-12 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
+        <div class="h-12 w-12 rounded-full bg-pink-50 dark:bg-pink-900/20 flex items-center justify-center text-pink-500 dark:text-pink-400">
           <span class="material-symbols-outlined text-2xl">schedule</span>
         </div>
       </div>
 
       <!-- Studies Card -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-between transition-colors duration-200">
         <div>
-          <p class="text-sm font-medium text-gray-500 mb-1">Total Studies</p>
-          <p class="text-3xl font-bold text-gray-900">${totalEst}</p>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Studies</p>
+          <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">${totalEst}</p>
         </div>
-        <div class="h-12 w-12 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
+        <div class="h-12 w-12 rounded-full bg-pink-50 dark:bg-pink-900/20 flex items-center justify-center text-pink-500 dark:text-pink-400">
           <span class="material-symbols-outlined text-2xl">local_library</span>
         </div>
       </div>

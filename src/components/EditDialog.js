@@ -10,10 +10,10 @@ export function createEditDialog() {
   modal.className =
     "fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm transition-opacity";
   modal.innerHTML = `
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all scale-100">
-      <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-        <h3 class="text-lg font-bold text-gray-900">Edit Record</h3>
-        <button type="button" id="edit-close-x" class="text-gray-400 hover:text-gray-600 transition-colors">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden transform transition-all scale-100 dark:shadow-gray-900/50">
+      <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-700/30">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">Edit Record</h3>
+        <button type="button" id="edit-close-x" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -22,23 +22,23 @@ export function createEditDialog() {
         
         <!-- Date -->
         <div>
-          <label for="edit-date" class="block text-sm font-medium text-gray-700 mb-1.5">Date</label>
-          <input id="edit-date" type="date" class="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all" />
+          <label for="edit-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Date</label>
+          <input id="edit-date" type="date" class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block w-full p-2.5 transition-all dark:[color-scheme:dark]" />
         </div>
 
         <!-- Hours -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Hours</label>
-          <div id="edit-timepicker-container" class="border border-gray-200 rounded-xl p-4 bg-gray-50 flex justify-center"></div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Hours</label>
+          <div id="edit-timepicker-container" class="border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-gray-50 dark:bg-gray-700/30 flex justify-center"></div>
           <input id="edit-horas" type="hidden" />
         </div>
 
         <!-- Studies -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">Study Names</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Study Names</label>
           <div class="flex gap-2 mb-2">
-            <input id="edit-est-input" type="text" placeholder="Enter name" class="flex-1 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block p-2.5 transition-all" />
-            <button type="button" id="edit-name-btn" class="px-4 py-2 bg-pink-100 text-pink-700 rounded-xl hover:bg-pink-200 font-medium transition-colors">Add</button>
+            <input id="edit-est-input" type="text" placeholder="Enter name" class="flex-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-gray-100 text-sm rounded-xl focus:ring-pink-500 focus:border-pink-500 block p-2.5 transition-all" />
+            <button type="button" id="edit-name-btn" class="px-4 py-2 bg-pink-100 dark:bg-pink-900/40 text-pink-700 dark:text-pink-300 rounded-xl hover:bg-pink-200 dark:hover:bg-pink-900/60 font-medium transition-colors">Add</button>
           </div>
           
           <!-- Pending List -->
@@ -49,7 +49,7 @@ export function createEditDialog() {
 
         <!-- Buttons -->
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" id="edit-cancel" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 focus:z-10 focus:ring-2 focus:ring-gray-300 transition-all cursor-pointer">Cancel</button>
+          <button type="button" id="edit-cancel" class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 hover:text-gray-900 dark:hover:text-white focus:z-10 focus:ring-2 focus:ring-gray-300 transition-all cursor-pointer">Cancel</button>
           <button type="submit" id="edit-save" class="px-5 py-2.5 text-sm font-medium text-white bg-pink-600 rounded-xl hover:bg-pink-700 focus:ring-4 focus:ring-pink-200 transition-all shadow-sm shadow-pink-200 cursor-pointer">Save Changes</button>
         </div>
       </form>
@@ -86,9 +86,9 @@ export function createEditDialog() {
     pendingList.innerHTML = "";
     pendingNames.forEach((name, index) => {
       const div = document.createElement("div");
-      div.className = "flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg border border-gray-100";
+      div.className = "flex items-center justify-between bg-gray-50 dark:bg-gray-700/50 px-3 py-2 rounded-lg border border-gray-100 dark:border-gray-700";
       div.innerHTML = `
-            <span class="text-sm text-gray-700 font-medium">${name}</span>
+            <span class="text-sm text-gray-700 dark:text-gray-200 font-medium">${name}</span>
             <button type="button" data-index="${index}" class="remove-pending-btn text-gray-400 hover:text-red-500">
                 <span class="material-symbols-outlined text-lg">close</span>
             </button>
