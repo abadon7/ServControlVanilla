@@ -15,11 +15,11 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   element.innerHTML = `
     <!-- Display Section -->
     <div class="tp-display mb-6 flex justify-center items-end gap-1">
-      <div class="tp-hour-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300">
+      <div class="tp-hour-display text-[40px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300">
         ${pad(hour)}
       </div>
-      <div class="text-[56px] leading-none font-medium text-gray-800 dark:text-gray-200 pb-2">:</div>
-      <div class="tp-minute-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+      <div class="text-[40px] leading-none font-medium text-gray-800 dark:text-gray-200 pb-2">:</div>
+      <div class="tp-minute-display text-[40px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
         ${pad(minute)}
       </div>
     </div>
