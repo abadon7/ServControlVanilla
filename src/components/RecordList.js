@@ -10,8 +10,8 @@ export function createRecordList(target, initialPath, userName) {
   container.innerHTML = `
       <div id="totals"></div>
       
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-200">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div id="selectors" class="flex items-center gap-3"></div>
           <button id="add-record-btn" class="flex items-center gap-2 px-5 py-2.5 bg-pink-600 text-white text-sm font-medium rounded-xl hover:bg-pink-700 transition-colors shadow-sm shadow-pink-200 cursor-pointer">
             <span class="material-symbols-outlined text-lg">add</span>
@@ -22,22 +22,22 @@ export function createRecordList(target, initialPath, userName) {
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-gray-50/50 text-gray-500 text-xs uppercase tracking-wider font-semibold border-b border-gray-100">
+              <tr class="bg-gray-50/50 dark:bg-gray-700/30 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider font-semibold border-b border-gray-100 dark:border-gray-700">
                 <th class="px-4 py-4">Day</th>
                 <th class="px-4 py-4">Hours</th>
                 <th class="px-4 py-4">Studies</th>
                 <th class="px-4 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="items" class="divide-y divide-gray-100 text-sm text-gray-700"></tbody>
+            <tbody id="items" class="divide-y divide-gray-100 dark:divide-gray-700 text-sm text-gray-700 dark:text-gray-300"></tbody>
           </table>
         </div>
         <div id="empty-state" class="hidden p-12 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
-                <span class="material-symbols-outlined text-3xl text-gray-400">calendar_today</span>
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-700/50 mb-4">
+                <span class="material-symbols-outlined text-3xl text-gray-400 dark:text-gray-500">calendar_today</span>
             </div>
-            <h3 class="text-lg font-medium text-gray-900 mb-1">No records found</h3>
-            <p class="text-gray-500">Get started by adding a new record for this month.</p>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">No records found</h3>
+            <p class="text-gray-500 dark:text-gray-400">Get started by adding a new record for this month.</p>
         </div>
       </div>
   `;
@@ -106,7 +106,7 @@ export function createRecordList(target, initialPath, userName) {
       if (userName === "Henry") {
         userSelectorHTML = `
           <div class="relative">
-            <select id="user-selector" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
+            <select id="user-selector" class="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
               <option value="Henry" selected>Henry</option>
               <option value="Carolina">Carolina</option>
             </select>
@@ -120,7 +120,7 @@ export function createRecordList(target, initialPath, userName) {
       selectorsEl.innerHTML = `
           ${userSelectorHTML}
           <div class="relative">
-            <select id="month-selector" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
+            <select id="month-selector" class="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
               ${monthOptions}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -128,7 +128,7 @@ export function createRecordList(target, initialPath, userName) {
             </div>
           </div>
           <div class="relative">
-            <select id="year-selector" class="appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
+            <select id="year-selector" class="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 py-2 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 transition-all font-medium cursor-pointer">
               ${yearOptions}
             </select>
             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -197,7 +197,7 @@ export function createRecordList(target, initialPath, userName) {
     Object.entries(data).forEach(([key, value]) => {
       itemsCache[key] = value || {};
       const tr = document.createElement("tr");
-      tr.className = "group hover:bg-pink-50/30 transition-colors";
+      tr.className = "group hover:bg-pink-50/30 dark:hover:bg-pink-900/10 transition-colors";
 
       const day = value?.date?.split("-")[2] || "0";
       const horas = value?.horas || "0";
@@ -212,15 +212,15 @@ export function createRecordList(target, initialPath, userName) {
       }
 
       tr.innerHTML = `
-        <td class="px-6 py-4 font-medium text-gray-900">${escapeHtml(day)}</td>
-        <td class="px-6 py-4 text-gray-600">${escapeHtml(horas)}</td>
-        <td class="px-6 py-4 text-gray-600 font-medium">${estCount}</td>
+        <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-100">${escapeHtml(day)}</td>
+        <td class="px-6 py-4 text-gray-600 dark:text-gray-300">${escapeHtml(horas)}</td>
+        <td class="px-6 py-4 text-gray-600 dark:text-gray-300 font-medium">${estCount}</td>
         <td class="px-4 py-4 text-right">
           <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-            <button data-key="${key}" class="edit-btn p-2 text-gray-400 hover:text-pink-600 hover:bg-pink-50 rounded-lg transition-colors" title="Edit">
+            <button data-key="${key}" class="edit-btn p-2 text-gray-400 hover:text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-lg transition-colors" title="Edit">
               <span class="material-symbols-outlined text-[20px]">edit</span>
             </button>
-            <button data-key="${key}" class="remove-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+            <button data-key="${key}" class="remove-btn p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Delete">
               <span class="material-symbols-outlined text-[20px]">delete</span>
             </button>
           </div>

@@ -2,21 +2,24 @@
 
 export function showNotification(message, type = 'success', action = null, duration = 3000) {
     let container = document.getElementById('notification-container');
+    const containerClass = 'fixed bottom-4 left-0 right-0 z-50 flex flex-col gap-2 pointer-events-none items-center px-4 sm:px-0';
+
     if (!container) {
         container = document.createElement('div');
         container.id = 'notification-container';
-        container.className = 'fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none';
         document.body.appendChild(container);
     }
+    // Always update class to ensure responsiveness
+    container.className = containerClass;
 
     const notification = document.createElement('div');
-    const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-gray-800';
+    const bgColor = type === 'success' ? 'bg-green-500 dark:bg-green-600' : type === 'error' ? 'bg-red-500 dark:bg-red-600' : 'bg-gray-800 dark:bg-gray-700';
     const icon = type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info';
 
     notification.className = `
-    ${bgColor} text-white px-4 py-3 rounded-xl shadow-lg shadow-gray-200 
+    ${bgColor} text-white px-4 py-2.5 rounded-xl shadow-lg shadow-gray-200 dark:shadow-gray-900/50
     flex items-center gap-3 transform transition-all duration-300 translate-y-10 opacity-0
-    pointer-events-auto min-w-[300px] max-w-md
+    pointer-events-auto w-full max-w-md
   `;
 
     let actionHtml = '';

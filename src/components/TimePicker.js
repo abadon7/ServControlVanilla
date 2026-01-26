@@ -15,18 +15,18 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
   element.innerHTML = `
     <!-- Display Section -->
     <div class="tp-display mb-6 flex justify-center items-end gap-1">
-      <div class="tp-hour-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors bg-pink-100 text-pink-600">
+      <div class="tp-hour-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300">
         ${pad(hour)}
       </div>
-      <div class="text-[56px] leading-none font-medium text-gray-800 pb-2">:</div>
-      <div class="tp-minute-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors text-gray-800 hover:bg-gray-100">
+      <div class="text-[56px] leading-none font-medium text-gray-800 dark:text-gray-200 pb-2">:</div>
+      <div class="tp-minute-display text-[56px] leading-none font-medium cursor-pointer rounded-xl px-4 py-2 transition-colors text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
         ${pad(minute)}
       </div>
     </div>
 
     <!-- Clock Face Section -->
     <div class="tp-clock relative mx-auto" style="width:200px;height:200px">
-      <div class="absolute inset-0 rounded-full bg-gray-100"></div>
+      <div class="absolute inset-0 rounded-full bg-gray-100 dark:bg-gray-700"></div>
       <svg viewBox="0 0 256 256" width="200" height="200" class="block relative z-10 pointer-events-none">
         <g transform="translate(128,128)">
           <!-- Center Dot -->
@@ -48,12 +48,12 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
 
     <!-- Actions -->
     <div class="tp-actions mt-6 flex gap-4 justify-between items-center px-4">
-      <button type="button" class="tp-btn-now text-sm font-medium text-pink-600 hover:bg-pink-50 px-3 py-2 rounded-lg transition-colors">
+      <button type="button" class="tp-btn-now text-sm font-medium text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 px-3 py-2 rounded-lg transition-colors">
         <span class="material-symbols-outlined align-middle text-lg mr-1">schedule</span>Now
       </button>
       <div class="flex gap-2">
-        <button type="button" class="tp-btn-cancel text-sm font-medium text-pink-600 hover:bg-pink-50 px-4 py-2 rounded-full transition-colors">Cancel</button>
-        <button type="button" class="tp-btn-ok text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-full shadow-sm shadow-pink-200 transition-colors">OK</button>
+        <button type="button" class="tp-btn-cancel text-sm font-medium text-pink-600 dark:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 px-4 py-2 rounded-full transition-colors">Cancel</button>
+        <button type="button" class="tp-btn-ok text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 px-6 py-2 rounded-full shadow-sm shadow-pink-200 dark:shadow-pink-900/20 transition-colors">OK</button>
       </div>
     </div>
   `;
@@ -88,8 +88,9 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('font-size', '16');
     text.setAttribute('font-weight', '500');
-    text.setAttribute('fill', '#1f2937');
-    text.setAttribute('class', 'tp-number-text pointer-events-none transition-colors duration-200');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', 'currentColor');
+    text.setAttribute('class', 'tp-number-text pointer-events-none transition-colors duration-200 text-gray-800 dark:text-gray-200');
     text.setAttribute('data-val', String(i % 12));
     text.textContent = String(i === 12 ? 12 : i);
     numbersGroup.appendChild(text);
@@ -118,8 +119,9 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
     text.setAttribute('text-anchor', 'middle');
     text.setAttribute('font-size', '16');
     text.setAttribute('font-weight', '500');
-    text.setAttribute('fill', '#1f2937');
-    text.setAttribute('class', 'tp-tick-text pointer-events-none transition-colors duration-200');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', 'currentColor');
+    text.setAttribute('class', 'tp-tick-text pointer-events-none transition-colors duration-200 text-gray-800 dark:text-gray-200');
     text.setAttribute('data-val', String(m));
     text.textContent = String(m).padStart(2, '0');
     ticksGroup.appendChild(text);
@@ -195,17 +197,17 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
 
     // Toggle Display Styles
     if (m === 'hour') {
-      hourEl.classList.add('bg-pink-100', 'text-pink-600');
-      hourEl.classList.remove('text-gray-800', 'hover:bg-gray-100');
+      hourEl.classList.add('bg-pink-100', 'text-pink-600', 'dark:bg-pink-900/40', 'dark:text-pink-300');
+      hourEl.classList.remove('text-gray-800', 'hover:bg-gray-100', 'dark:text-gray-200', 'dark:hover:bg-gray-700');
 
-      minuteEl.classList.remove('bg-pink-100', 'text-pink-600');
-      minuteEl.classList.add('text-gray-800', 'hover:bg-gray-100');
+      minuteEl.classList.remove('bg-pink-100', 'text-pink-600', 'dark:bg-pink-900/40', 'dark:text-pink-300');
+      minuteEl.classList.add('text-gray-800', 'hover:bg-gray-100', 'dark:text-gray-200', 'dark:hover:bg-gray-700');
     } else {
-      minuteEl.classList.add('bg-pink-100', 'text-pink-600');
-      minuteEl.classList.remove('text-gray-800', 'hover:bg-gray-100');
+      minuteEl.classList.add('bg-pink-100', 'text-pink-600', 'dark:bg-pink-900/40', 'dark:text-pink-300');
+      minuteEl.classList.remove('text-gray-800', 'hover:bg-gray-100', 'dark:text-gray-200', 'dark:hover:bg-gray-700');
 
-      hourEl.classList.remove('bg-pink-100', 'text-pink-600');
-      hourEl.classList.add('text-gray-800', 'hover:bg-gray-100');
+      hourEl.classList.remove('bg-pink-100', 'text-pink-600', 'dark:bg-pink-900/40', 'dark:text-pink-300');
+      hourEl.classList.add('text-gray-800', 'hover:bg-gray-100', 'dark:text-gray-200', 'dark:hover:bg-gray-700');
     }
     updateHand(); // refresh hand position for new mode
   }
@@ -230,13 +232,17 @@ export default function createTimePicker({ initial = '00:00', step = 5 } = {}) {
 
     // Update text colors based on selection
     // Reset all
-    element.querySelectorAll('.tp-number-text, .tp-tick-text').forEach(el => el.setAttribute('fill', '#1f2937'));
+    element.querySelectorAll('.tp-number-text, .tp-tick-text').forEach(el => {
+      el.classList.remove('text-white');
+      el.classList.add('text-gray-800', 'dark:text-gray-200');
+    });
 
     // Highlight selected
     const selector = mode === 'hour' ? `.tp-number-text[data-val="${val}"]` : `.tp-tick-text[data-val="${val}"]`;
     const selectedText = element.querySelector(selector);
     if (selectedText) {
-      selectedText.setAttribute('fill', '#ffffff');
+      selectedText.classList.remove('text-gray-800', 'dark:text-gray-200');
+      selectedText.classList.add('text-white');
       // Counter-rotate text so it stays upright? No, standard material rotates the whole hand.
       // But the text inside the bubble needs to be upright relative to the page? 
       // Actually, standard material just highlights the text on the dial.

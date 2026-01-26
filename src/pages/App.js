@@ -5,6 +5,13 @@ import { createEditDialog } from "../components/EditDialog.js";
 import { createAddDialog } from "../components/AddDialog.js";
 
 export function mountApp(target = "#app") {
+  // Initialize Theme
+  if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+
   const userP = auth.currentUser;
   console.log("Current user:", userP);
   const firstName = userP?.displayName?.split(" ")[0]?.trim();
